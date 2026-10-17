@@ -19,8 +19,8 @@ NTFY_TOPIC = require_env("NTFY_TOPIC")
 
 A1_SHAPE = "VM.Standard.A1.Flex"
 
-MAX_OCPUS = 4
-MAX_MEMORY_GB = 24
+MAX_OCPUS = 2
+MAX_MEMORY_GB = 12
 MEMORY_STEP_GB = 2
 MIN_MEMORY_GB_PER_OCPU = 1
 
@@ -82,7 +82,7 @@ def get_a1_instances(compute_client):
     return [
         instance for instance in instances
         if instance.shape == A1_SHAPE
-        and instance.lifecycle_state not in ("TERMINATING", "TERMINATED")
+        and instance.lifecycle_state != "TERMINATED"
     ]
 
 
@@ -145,6 +145,14 @@ def keep_trying(error, label):
     if error.status == 429:
         print("Rate limited by OCI. Will try again next run.")
         return False
+
+    if error.code == "LimitExceeded":
+        raise SystemExit(
+            "Oracle says this size is over your A1 limit. Check the A1 limit "
+            "on the Limits, Quotas and Usage page, set MAX_OCPUS and "
+            "MAX_MEMORY_GB in hunter.py to match, and make sure no other A1 "
+            "instance exists (check every compartment)."
+        )
 
     raise error
 

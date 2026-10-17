@@ -3,17 +3,19 @@ Oracle A1 Hunter
 ---
 
 Keeps trying to get the strongest Always Free Oracle Cloud instance,
-**VM.Standard.A1.Flex with 4 OCPU / 24 GB RAM**.
+**VM.Standard.A1.Flex with 2 OCPU / 12 GB RAM**. Oracle cut the Always Free
+A1 limit from 4 OCPU / 24 GB to this in 2026. The limit is set by `MAX_OCPUS`
+and `MAX_MEMORY_GB` at the top of `hunter.py`.
 
 Each run:
 
-- **No A1 instance yet:** tries 4, 3, 2, then 1 OCPU. For each OCPU count it
-  tries 24 GB RAM down to 2 GB in 2 GB steps (Oracle needs at least 1 GB per
-  OCPU), in every Availability Domain, and keeps the first one it gets.
-- **A1 instance smaller than 4 OCPU / 24 GB:** tries to resize it up, biggest
+- **No A1 instance yet:** tries 2 OCPU, then 1. For each OCPU count it tries
+  12 GB RAM down to 2 GB in 2 GB steps (Oracle needs at least 1 GB per OCPU),
+  in every Availability Domain, and keeps the first one it gets.
+- **A1 instance smaller than 2 OCPU / 12 GB:** tries to resize it up, biggest
   size first, never lowering OCPU or RAM. A successful resize reboots the
   instance.
-- **A1 instance at 4 OCPU / 24 GB:** does nothing.
+- **A1 instance at 2 OCPU / 12 GB:** does nothing.
 
 Each run stops after about 4 minutes and starts over on the next run. If the
 logs often end with `Out of time`, set `MEMORY_STEP_GB` in `hunter.py` to
@@ -113,5 +115,8 @@ After that it runs on its own every 5 minutes.
   account to Pay As You Go is widely reported to make A1 capacity much easier
   to get, and Always Free resources stay free. It needs a card, so set a
   budget alert and only create Always Free resources.
+- Some users report that Pay As You Go accounts can still use 4 OCPU / 24 GB
+  for free. Oracle hasn't confirmed this and its docs say 2 OCPU / 12 GB, so
+  raising `MAX_OCPUS` / `MAX_MEMORY_GB` on such an account may cost money.
 - Oracle may reclaim Always Free instances that sit idle for 7 days (Pay As
   You Go accounts are exempt), so keep something running on it.
