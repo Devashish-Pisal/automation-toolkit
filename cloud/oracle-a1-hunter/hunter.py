@@ -148,10 +148,10 @@ def keep_trying(error, label):
 
     if error.code == "LimitExceeded":
         raise SystemExit(
-            "Oracle says this size is over your A1 limit. Check the A1 limit "
-            "on the Limits, Quotas and Usage page, set MAX_OCPUS and "
-            "MAX_MEMORY_GB in hunter.py to match, and make sure no other A1 "
-            "instance exists (check every compartment)."
+            f"Oracle says a limit was exceeded: {error.message}\n"
+            "Check the Limits, Quotas and Usage page. For A1 limits, set "
+            "MAX_OCPUS and MAX_MEMORY_GB in hunter.py to match and make sure "
+            "no other A1 instance exists (check every compartment)."
         )
 
     raise error
